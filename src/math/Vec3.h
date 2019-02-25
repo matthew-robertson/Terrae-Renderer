@@ -7,6 +7,7 @@
 class Vec3 {
 	public:
 		Vec3 () {}
+		Vec3(const double x){ elements[0] = x; elements[1] = x; elements[2] = x; }
   		Vec3(const double x, const double y, const double z){ elements[0] = x; elements[1] = y; elements[2] = z; }
   		inline double x() const { return elements[0]; }
   		inline double y() const { return elements[1]; }

@@ -2,15 +2,17 @@
 #define SPHEREH
 
 #include "Hitable.h"
+#include "../Mats/Material.h"
 
 class Sphere: public Hitable {
 	public:
 		Sphere() {}
-		Sphere(Vec3 c, double r) : center(c), radius(r) {};
+		Sphere(Vec3 c, double r, Material *m) : center(c), radius(r), mat(m) {};
 		virtual bool checkIntersection(const Ray& r, double tMin, double tMax, hit_record& rec) const;
 
 		Vec3 center;
 		double radius;
+		Material *mat;
 };
 
 bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_record& rec) const {
@@ -26,6 +28,7 @@ bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_recor
 			rec.t = temp;
 			rec.pos = r.pointAtParam(rec.t);
 			rec.normal = (rec.pos - center) / radius;
+			rec.hitMat = mat;
 			return true;
 		}
 		
@@ -34,6 +37,7 @@ bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_recor
 			rec.t = temp;
 			rec.pos = r.pointAtParam(rec.t);
 			rec.normal = (rec.pos - center) / radius;
+			rec.hitMat = mat;
 			return true;
 		}
 	}

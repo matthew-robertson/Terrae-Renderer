@@ -153,4 +153,32 @@ inline Vec3& Vec3::operator/=(const double t) {
 inline Vec3 normalize(Vec3 v) {
 	return v / v.length();
 }
+
+Vec3 randomInUnitSphere() {
+	Vec3 p;
+	do {
+		double r1 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		double r2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		double r3 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+
+		p = 2.0*Vec3(r1, r2, r3) - Vec3(0.0);
+	} while (p.squaredLength() >= 1.0);
+	return p;
+}
+
+Vec3 reflect(const Vec3& v, const Vec3& n) {
+	return v - 2*dot(v,n)*n;
+}
+
+bool refract(const Vec3& v, const Vec3& n, double niOverNt, Vec3& refracted) {
+	Vec3 unitVector = normalize(v);
+	double dt = dot(unitVector, n);
+	double discriminant = 1.0 - niOverNt*niOverNt*(1.0-dt*dt);
+
+	if (discriminant > 0.0) {
+		refracted = niOverNt*(unitVector - n*dt) - n*sqrt(discriminant);
+		return true;
+	}
+	return false;
+}
 #endif

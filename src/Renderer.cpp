@@ -1,4 +1,4 @@
-#include <iostream>  
+#include <iostream>
 #include <stdlib.h>
 #include <vector>
 
@@ -7,32 +7,29 @@
 #include "Camera.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/HitableCollection.h"
+#include "Mats/LambertMaterial.h"
+#include "Mats/MetalMaterial.h"
+#include "Mats/DielectricMaterial.h"
 #include "Math/Ray.h"
 #include "Math/Vec3.h"
 
-Vec3 randomInUnitSphere() {
-	Vec3 p;
-	do {
-		double r1 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-		double r2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-		double r3 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-
-		p = 2.0*Vec3(r1, r2, r3) - Vec3(0.0);
-	} while (p.squaredLength() >= 1.0);
-	return p;
-}
-
-Vec3 getColour(const Ray& r, Hitable *world) {
+Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
 
 	if (world->checkIntersection(r, 0.001, 32000.0, rec)){
-		Vec3 targetPoint = rec.pos +rec.normal + randomInUnitSphere();
-		return 0.5*getColour(Ray(rec.pos, targetPoint - rec.pos), world);
+		Ray scattered;
+		Vec3 attenuation;
+
+		if (depth < 50 && rec.hitMat->scatter(r, rec, attenuation, scattered)) {
+			return attenuation * getColour(scattered, world, depth+1);
+		} else {
+			return Vec3(0.0);
+		}
 	}
 	else {
 		Vec3 nRD = normalize(r.direction());
 		double t = .5 * (nRD.y() + 1.0);
-		return (1.0-t)*Vec3(1.0,1.0,1.0) + t*Vec3(0.5, 0.1, 0.7);
+		return (1.0-t)*Vec3(1.0,1.0,1.0) + t*Vec3(0.2, 0.5, 0.8);
 	}
 }
 
@@ -54,10 +51,13 @@ void main(int argc, char *argv[])
 	const char *outputFile = argv[5];
 
 	// TODO: Parse the scene file
-	Hitable *list[2];
-	list[0] = new Sphere(Vec3(0.0, 0.0, -1.0), 0.5);
-	list[1] = new Sphere(Vec3(0.0, -100.5, -1.0), 100.);
-	Hitable *world = new HitableCollection(list, 2);
+	Hitable *list[5];
+	list[0] = new Sphere(Vec3(0.0, 0.0, -1.0), 0.5, new LambertMaterial(Vec3(0.1, 0.2, 0.5)));
+	list[1] = new Sphere(Vec3(0.0, -100.5, -1.0), 100., new LambertMaterial(Vec3(0.8, 0.8, 0.0)));
+	list[2] = new Sphere(Vec3(1.0, 0.0, -1.0), 0.5, new MetalMaterial(Vec3(0.8, 0.6, 0.3), 0.3));
+	list[3] = new Sphere(Vec3(-1.0, 0.0, -1.0), 0.5, new DielectricMaterial(1.5));
+	list[4] = new Sphere(Vec3(-1.0, 0.0, -1.0), -0.45, new DielectricMaterial(1.5));
+	Hitable *world = new HitableCollection(list, 5);
 
 	// TODO: Path trace some shit
 	std::vector<unsigned char> image;
@@ -72,7 +72,7 @@ void main(int argc, char *argv[])
 				double v = (double(j) + r2)/double(height);
 
 				Ray r = cam.getRay(u,v);
-				col += getColour(r, world);
+				col += getColour(r, world, 0);
 			}
 			col/= nAAR;
 			col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
@@ -82,6 +82,7 @@ void main(int argc, char *argv[])
 			image.push_back(255 * col[2]);
 			image.push_back(255);
 		}
+		std::cout << "Done: " << j << std::endl;
 	}
 
 	unsigned error = lodepng::encode(outputFile, image, width, height);

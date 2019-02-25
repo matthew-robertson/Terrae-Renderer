@@ -82,7 +82,9 @@ void main(int argc, char *argv[])
 			image.push_back(255 * col[2]);
 			image.push_back(255);
 		}
-		std::cout << "Done: " << j << std::endl;
+		if (j % 50 == 0){
+			std::cout << "Done: " << j << std::endl;
+		}
 	}
 
 	unsigned error = lodepng::encode(outputFile, image, width, height);

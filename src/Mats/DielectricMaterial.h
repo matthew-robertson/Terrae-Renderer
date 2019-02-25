@@ -5,7 +5,7 @@
 double schlick(double cosine, double refIdx) {
 	double r0 = (1.0 - refIdx) / (1.0 + refIdx);
 	r0 = r0*r0;
-	return r0 + (1.0 - r0)*pow((1.0-cosine), 5);
+	return r0 + (1.0 - r0)*pow((1.0-cosine), 5.0);
 }
 
 class DielectricMaterial : public Material {
@@ -39,7 +39,7 @@ class DielectricMaterial : public Material {
 			}
 
 			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-			if (reflectProb < r) {
+			if (r < reflectProb) {
 				scattered = Ray(rec.pos, reflected);
 			} else {
 				scattered = Ray(rec.pos, refracted);

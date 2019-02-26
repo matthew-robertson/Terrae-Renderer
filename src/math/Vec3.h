@@ -156,13 +156,26 @@ inline Vec3 normalize(Vec3 v) {
 
 Vec3 randomInUnitSphere() {
 	Vec3 p;
+	double r1, r2, r3;
 	do {
-		double r1 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-		double r2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-		double r3 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		r1 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		r2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		r3 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
 
 		p = 2.0*Vec3(r1, r2, r3) - Vec3(0.0);
 	} while (p.squaredLength() >= 1.0);
+	return p;
+}
+
+Vec3 randomInUnitDisc() {
+	Vec3 p;
+	double r1,r2;
+	do {
+		r1 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+		r2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+
+		p = 2.0* Vec3(r1, r2, 0.0) - Vec3(1.0,1.0, 0.0);
+	} while (dot(p,p) >= 1.0);
 	return p;
 }
 

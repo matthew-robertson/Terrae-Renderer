@@ -41,14 +41,15 @@ void main(int argc, char *argv[])
 		return 1;
 	}
 
-	//Camera setup
-	Camera cam;
 
 	const int width = std::atoi(argv[1]);
 	const int height = std::atoi(argv[2]);
 	const int nAAR = std::atoi(argv[3]);
 	const char *sceneFile = argv[4];
 	const char *outputFile = argv[5];
+
+	//Camera setup
+	Camera cam(Vec3(-2, 2, 1), Vec3(0,0,-1), Vec3(0,1,0), 30, double(width)/double(height));
 
 	// TODO: Parse the scene file
 	Hitable *list[5];

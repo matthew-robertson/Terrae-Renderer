@@ -7,11 +7,21 @@
 
 class Camera {
 	public:
-		Camera () {
-			lowerLeftCorner = Vec3(-2.0, -1.0, -1.0);
-			horizontalAxis  = Vec3( 4.0,  0.0,  0.0);
-			verticalAxis    = Vec3( 0.0,  2.0,  0.0);
-			origin          = Vec3( 0.0,  0.0,  0.0);
+		Camera (Vec3 lookFrom, Vec3 lookAt, Vec3 up, double vfov, double aspect) {
+			Vec3 u,w,v;
+			double theta = vfov*3.14159/180.0;
+			double halfHeight = tan(theta/2.0);
+			double halfWidth = halfHeight * aspect;
+
+			origin = lookFrom;
+
+			w = normalize(lookFrom - lookAt);
+			u = normalize(cross(up, w));
+			v = cross(w, u);
+
+			lowerLeftCorner = origin - halfWidth*u - halfHeight*v - w;
+			horizontalAxis  = 2.0*halfWidth*u;
+			verticalAxis    = 2.0*halfHeight*v;
 		}
 
 		Ray getRay(double u, double v) {

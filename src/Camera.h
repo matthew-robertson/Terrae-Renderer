@@ -44,8 +44,7 @@ class Camera {
 		Vec3 _verticalAxis;
 		Vec3 _u,_w,_v;
 		double _lensRadius;
-		double _ti;
-		double _tf;
+		double _ti, _tf;
 };
 
 #endif

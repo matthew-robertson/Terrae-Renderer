@@ -12,10 +12,7 @@
 #include "Mats/DielectricMaterial.h"
 #include "Math/Ray.h"
 #include "Math/Vec3.h"
-
-double randDouble() {
-	return static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-}
+#include "Math/Utils.h"
 
 Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
@@ -38,12 +35,12 @@ Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 }
 
 Hitable *randomScene() {
-	int n = 500;
+	int n = 4;
 	Hitable **list = new Hitable*[n+1];
 	list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new LambertMaterial(Vec3(0.5, 0.5, 0.5)));
 	int i = 1;
-	for (int a = -11; a < 11; a++) {
-		for (int b = -11; b < 11; b++) {
+	/*for (int a = -6; a < 6; a++) {
+		for (int b = -6; b < 6; b++) {
 			double chooseMat = randDouble();
 			Vec3 center(a+0.9*randDouble(), .0, b+.9*randDouble());
 			if ((center - Vec3(4,0,0)).length() > 0.9) {
@@ -52,7 +49,7 @@ Hitable *randomScene() {
 				if (chooseMat < 0.8) {					
 					mat = new LambertMaterial(Vec3(randDouble()*randDouble(),randDouble()*randDouble(),randDouble()*randDouble()));
 				} else if (chooseMat < 0.95) {
-					mat = new MetalMaterial(Vec3(0.5*(1 + randDouble()), 0.5*(1 + randDouble()), 0.5*(1 + randDouble())), 0.5*(1 + randDouble()));
+					mat = new MetalMaterial(Vec3(0.5*(1 + randDouble()), 0.5*(1 + randDouble()), 0.5*(1 + randDouble())), 0.5*randDouble());
 				} else {
 					mat = new DielectricMaterial(1.5);
 				}
@@ -60,7 +57,7 @@ Hitable *randomScene() {
 			}
 
 		}
-	}
+	}*/
 
 	list[i++] = new Sphere(Vec3(0, 1, 0), 1.0, new DielectricMaterial(1.5));
     list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new LambertMaterial(Vec3(0.4, 0.2, 0.1)));
@@ -89,7 +86,7 @@ void main(int argc, char *argv[])
 	Vec3 lookAt = Vec3(0);
 	double dist = 10.0;
 	double ap = 0.1;
-	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20, double(width)/double(height), ap, dist);
+	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20, double(width)/double(height), ap, dist, 0.0, 1.0);
 
 	// TODO: Parse the scene file
 	Hitable *world = randomScene();

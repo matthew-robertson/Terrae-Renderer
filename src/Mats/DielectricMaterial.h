@@ -2,6 +2,8 @@
 #define DIELECTRICH
 #include <iostream>
 
+#include "../Math/Utils.h"
+
 double schlick(double cosine, double refIdx) {
 	double r0 = (1.0 - refIdx) / (1.0 + refIdx);
 	r0 = r0*r0;
@@ -38,8 +40,7 @@ class DielectricMaterial : public Material {
 				reflectProb = 1.0;
 			}
 
-			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-			if (r < reflectProb) {
+			if (randDouble() < reflectProb) {
 				scattered = Ray(rec.pos, reflected);
 			} else {
 				scattered = Ray(rec.pos, refracted);

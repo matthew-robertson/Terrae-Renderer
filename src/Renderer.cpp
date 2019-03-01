@@ -5,6 +5,7 @@
 #include "lodepng.h"
 
 #include "Camera.h"
+#include "Geometry/BVHNode.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/HitableCollection.h"
 #include "Mats/LambertMaterial.h"
@@ -16,7 +17,6 @@
 
 Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
-
 	if (world->checkIntersection(r, 0.001, 32000.0, rec)){
 		Ray scattered;
 		Vec3 attenuation;
@@ -35,35 +35,34 @@ Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 }
 
 Hitable *randomScene() {
-	int n = 4;
+	int n = 5000;
 	Hitable **list = new Hitable*[n+1];
-	list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new LambertMaterial(Vec3(0.5, 0.5, 0.5)));
-	int i = 1;
-	/*for (int a = -6; a < 6; a++) {
-		for (int b = -6; b < 6; b++) {
+	list[0] = new Sphere(Vec3(0, -1000, 0), Vec3(0, -1000, 0), 1000, 0.0, 1.0, new LambertMaterial(Vec3(0.5, 0.5, 0.5)));
+	int i = 0;
+	for (int a = -11; a < 11; a++) {
+		for (int b = -11; b < 11; b++) {
 			double chooseMat = randDouble();
 			Vec3 center(a+0.9*randDouble(), .0, b+.9*randDouble());
-			if ((center - Vec3(4,0,0)).length() > 0.9) {
-				double randRadius = randDouble()*.3 + .1;
-				Material *mat;
-				if (chooseMat < 0.8) {					
-					mat = new LambertMaterial(Vec3(randDouble()*randDouble(),randDouble()*randDouble(),randDouble()*randDouble()));
-				} else if (chooseMat < 0.95) {
-					mat = new MetalMaterial(Vec3(0.5*(1 + randDouble()), 0.5*(1 + randDouble()), 0.5*(1 + randDouble())), 0.5*randDouble());
-				} else {
-					mat = new DielectricMaterial(1.5);
-				}
-				list[i++] = new Sphere(center+Vec3(0.0, randRadius, 0.0), randRadius, mat);
+			double randRadius = randDouble()*.3 + .1;
+			Material *mat;
+			if (chooseMat < 0.8) {					
+				mat = new LambertMaterial(Vec3(randDouble()*randDouble(),randDouble()*randDouble(),randDouble()*randDouble()));
+			} else if (chooseMat < 0.95) {
+				mat = new MetalMaterial(Vec3(0.5*(1 + randDouble()), 0.5*(1 + randDouble()), 0.5*(1 + randDouble())), 0.5*randDouble());
+			} else {
+				mat = new DielectricMaterial(1.5);
 			}
-
+			list[i++] = new Sphere(center+Vec3(0.0, randRadius, 0.0), center+Vec3(0.0, randRadius, 0.0), randRadius, 0.0, 1.0, mat);
 		}
-	}*/
+	}
 
-	list[i++] = new Sphere(Vec3(0, 1, 0), 1.0, new DielectricMaterial(1.5));
-    list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new LambertMaterial(Vec3(0.4, 0.2, 0.1)));
-    list[i++] = new Sphere(Vec3(4, 1, 0), 1.0, new MetalMaterial(Vec3(0.7, 0.6, 0.5), 0.0));
+	list[i++] = new Sphere(Vec3(0, 1, 0), Vec3(0, 1, 0), 1.0, 0.0, 1.0, new DielectricMaterial(1.5));
+    list[i++] = new Sphere(Vec3(-4, 1, 0), Vec3(-4, 1, 0), 1.0, 0.0, 1.0, new LambertMaterial(Vec3(0.4, 0.2, 0.1)));
+    list[i++] = new Sphere(Vec3(4, 1, 0), Vec3(4, 1, 0), 1.0, 0.0, 0.5, new MetalMaterial(Vec3(0.7, 0.6, 0.5), 0.0));
 
-	return new HitableCollection(list, i);
+   
+	//return new HitableCollection(list, i);
+	return new BVHNode(list, i, 0, 1);
 }
 
 
@@ -85,12 +84,12 @@ void main(int argc, char *argv[])
 	Vec3 lookFrom = Vec3(13,2,3);
 	Vec3 lookAt = Vec3(0);
 	double dist = 10.0;
-	double ap = 0.1;
-	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20, double(width)/double(height), ap, dist, 0.0, 1.0);
+	double ap = 0.001;
+	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 25, double(width)/double(height), ap, dist, 0.0, 1.0);
 
 	// TODO: Parse the scene file
 	Hitable *world = randomScene();
-
+	std::cout << "Starting!" << std::endl;
 	// TODO: Path trace some shit
 	std::vector<unsigned char> image;
 	for (int j = height-1; j >= 0; j--){

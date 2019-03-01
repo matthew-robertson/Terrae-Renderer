@@ -2,7 +2,6 @@
 #define VEC3H
 
 #include <math.h>
-#include <stdlib.h>
 #include <iostream>
 
 #include "Utils.h"
@@ -50,7 +49,7 @@ inline std::istream& operator>>(std::istream &is, Vec3 &v) {
 }
 
 inline std::ostream& operator<<(std::ostream &os, const Vec3 &v) {
-	os << "X: " << v.elements[0] << " Y: " << v.elements[1] << " Z: " << v.elements[2];
+	os << "Vec3(" << v.elements[0] << ", " << v.elements[1] << ", " << v.elements[2] << ")";
 	return os;
 }
 
@@ -155,6 +154,14 @@ inline Vec3& Vec3::operator/=(const double t) {
 
 inline Vec3 normalize(Vec3 v) {
 	return v / v.length();
+}
+
+Vec3 min(Vec3 v1, Vec3 v2) {
+	return Vec3(ffmin(v1.x(), v2.x()), ffmin(v1.y(), v2.y()), ffmin(v1.z(), v2.z()));
+}
+
+Vec3 max(Vec3 v1, Vec3 v2) {
+	return Vec3(ffmax(v1.x(), v2.x()), ffmax(v1.y(), v2.y()), ffmax(v1.z(), v2.z()));
 }
 
 Vec3 randomInUnitSphere() {

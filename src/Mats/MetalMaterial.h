@@ -1,18 +1,20 @@
 #ifndef METALH
 #define METALH
 
+#include "../Textures/Texture.h"
+
 class MetalMaterial : public Material {
 	public:
-		MetalMaterial(Vec3 alb, double f): albedo(alb) { if (f < 1.0) fuzz = f; else fuzz = 1.0;}
+		MetalMaterial(Texture *t, double f): _albedo(t) { if (f < 1.0) _fuzz = f; else _fuzz = 1.0;}
 		virtual bool scatter(const Ray& rIn, const hit_record& rec, Vec3& attenuation, Ray& scattered) const {
 			Vec3 ref = reflect(normalize(rIn.direction()), rec.normal);
-			scattered = Ray(rec.pos, ref + fuzz*randomInUnitSphere(), rIn.time());
-			attenuation = albedo;
+			scattered = Ray(rec.pos, ref + _fuzz*randomInUnitSphere(), rIn.time());
+			attenuation = _albedo->value(0.0, 0.0, rec.pos);
 			return dot(scattered.direction(), rec.normal) > 0.0;
 		}
 
 	private:
-		Vec3 albedo;
-		double fuzz;
+		Texture *_albedo;
+		double _fuzz;
 };
 #endif

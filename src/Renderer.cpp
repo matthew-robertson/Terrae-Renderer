@@ -1,3 +1,4 @@
+#include <float.h>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
@@ -8,9 +9,11 @@
 #include "Geometry/BVHNode.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/HitableCollection.h"
+#include "Geometry/XYRect.h"
 #include "Mats/LambertMaterial.h"
 #include "Mats/MetalMaterial.h"
 #include "Mats/DielectricMaterial.h"
+#include "Mats/DiffuseLightMaterial.h"
 #include "Math/Ray.h"
 #include "Math/Vec3.h"
 #include "Math/Utils.h"
@@ -19,21 +22,44 @@
 
 Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
-	if (world->checkIntersection(r, 0.001, 32000.0, rec)){
+	if (world->checkIntersection(r, 0.001, DBL_MAX, rec)){
 		Ray scattered;
 		Vec3 attenuation;
-
+		Vec3 emitted = rec.hitMat->emitted(0, 0, rec.pos);
 		if (depth < 50 && rec.hitMat->scatter(r, rec, attenuation, scattered)) {
-			return attenuation * getColour(scattered, world, depth+1);
+			return emitted + attenuation * getColour(scattered, world, depth+1);
 		} else {
-			return Vec3(0.0);
+			return emitted;
 		}
 	}
 	else {
-		Vec3 nRD = normalize(r.direction());
-		double t = .5 * (nRD.y() + 1.0);
-		return (1.0-t)*Vec3(1.0,1.0,1.0) + t*Vec3(0.2, 0.5, 0.8);
+		return Vec3(0.0);
 	}
+}
+
+Hitable *simpleLight() {
+	Hitable **list = new Hitable*[4];
+
+	Texture *green = new ConstantTexture(Vec3(0.1, 0.3, 0.2));
+	Texture *white = new ConstantTexture(Vec3(0.9, 0.9, 0.9));
+	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(4.0)));
+
+	list[0] = new Sphere(Vec3(0, -1000, 0), Vec3(0, -1000, 0), 
+						1000, 
+						0.0, 1.0,
+						new LambertMaterial(new CheckerTexture(green, white)));
+	list[1] = new Sphere(Vec3(0, 2, 0), Vec3(0, 2, 0), 
+						2, 
+						0.0, 1.0,
+						/*new LambertMaterial(new CheckerTexture(green, white))*/
+						new DielectricMaterial(1.5));
+	list[2] = new Sphere(Vec3(-3, 7, 4), Vec3(-3, 7, 4), 
+						2, 
+						0.0, 1.0,
+						light);
+	//list[3] = new XYRect(Vec3(0, 2, -2), Vec3(1, 1, 0), light);
+
+	return new HitableCollection(list, 3);
 }
 
 Hitable *randomScene() {
@@ -94,13 +120,14 @@ void main(int argc, char *argv[])
 
 	//Camera setup
 	Vec3 lookFrom = Vec3(13,2,3);
-	Vec3 lookAt = Vec3(0);
+	Vec3 lookAt = Vec3(0, 1.5, 0);
 	double dist = 10.0;
-	double ap = 0.001;
-	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20, double(width)/double(height), ap, dist, 0.0, 1.0);
+	double ap = 0.01;
+	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 30, double(width)/double(height), ap, dist, 0.0, 1.0);
 
 	// TODO: Parse the scene file
-	Hitable *world = randomScene();
+	//Hitable *world = randomScene();
+	Hitable *world = simpleLight();
 	std::cout << "Starting!" << std::endl;
 	// TODO: Path trace some shit
 	std::vector<unsigned char> image;

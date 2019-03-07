@@ -7,6 +7,8 @@
 class Material;
 
 struct hit_record {
+	double u;
+	double v;
 	double t;
 	Vec3 pos;
 	Vec3 normal;

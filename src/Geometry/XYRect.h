@@ -37,6 +37,10 @@ bool XYRect::checkIntersection(const Ray& r, double tMin, double tMax, hit_recor
 		return false;
 	}
 
+	Vec3 uvw = (hitPoint - (_center - _dims)) / (2.0*_dims);
+	rec.u = uvw.x();
+	rec.v = uvw.y();
+
 	rec.t = t;
 	rec.pos = r.pointAtParam(t);
 	rec.normal = Vec3(0.0, 0., 1.0);

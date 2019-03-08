@@ -4,6 +4,8 @@
 #include <vector>
 
 #include "lodepng.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include "Camera.h"
 #include "Geometry/BVHNode.h"
@@ -19,6 +21,7 @@
 #include "Math/Utils.h"
 #include "Textures/Texture.h"
 #include "Textures/CheckerTexture.h"
+#include "Textures/ImageTexture.h"
 
 Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
@@ -48,18 +51,21 @@ Hitable *simpleLight() {
 						1000, 
 						0.0, 1.0,
 						new LambertMaterial(new CheckerTexture(green, white)));
+	int nx, ny, nn;
+	unsigned char *tex_data = stbi_load("../testScenes/earthmap.jpg", &nx, &ny, &nn, 0);
+	Material *earth = new LambertMaterial(new ImageTexture(tex_data, nx, ny));
 	list[1] = new Sphere(Vec3(0, 2, 0), Vec3(0, 2, 0), 
 						2, 
 						0.0, 1.0,
-						/*new LambertMaterial(new CheckerTexture(green, white))*/
-						new DielectricMaterial(1.5));
-	list[2] = new Sphere(Vec3(-3, 7, 4), Vec3(-3, 7, 4), 
+						earth
+						/*new DielectricMaterial(1.5)*/);
+	list[2] = new Sphere(Vec3(3, 7, 4), Vec3(3, 7, 4), 
 						2, 
 						0.0, 1.0,
 						light);
-	//list[3] = new XYRect(Vec3(0, 2, -2), Vec3(1, 1, 0), light);
+	list[3] = new XYRect(Vec3(0, 2, -2), Vec3(1, 1, 0), light);
 
-	return new HitableCollection(list, 3);
+	return new HitableCollection(list, 4);
 }
 
 Hitable *randomScene() {

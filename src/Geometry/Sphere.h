@@ -4,6 +4,13 @@
 #include "Hitable.h"
 #include "../Mats/Material.h"
 
+void getSphereUVs(const Vec3& p, double& u, double& v) {
+	double phi = atan2(p.z(), p.x());
+	double theta = asin(p.y());
+	u = 1. - (phi + 3.14159) / (2.0*3.14159);
+	v = (theta + 3.14159/2.0) / 3.14159;
+}
+
 class Sphere: public Hitable {
 	public:
 		Sphere() {}
@@ -27,7 +34,8 @@ Vec3 Sphere::center(double t) const {
 }
 
 bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_record& rec) const {
-	Vec3 oc = r.origin() - center(r.time());
+	Vec3 ctr = center(r.time());
+	Vec3 oc = r.origin() - ctr;
 	double a = dot(r.direction(), r.direction());
 	double b = dot(oc, r.direction());
 	double c = dot(oc, oc) - _radius*_radius;
@@ -38,8 +46,10 @@ bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_recor
 		if (temp < tMax && temp > tMin) {
 			rec.t = temp;
 			rec.pos = r.pointAtParam(rec.t);
-			rec.normal = (rec.pos - center(r.time())) / _radius;
+			rec.normal = (rec.pos - ctr) / _radius;
 			rec.hitMat = _mat;
+			getSphereUVs((rec.pos - ctr)/_radius, rec.u, rec.v);
+
 			return true;
 		}
 		
@@ -47,8 +57,10 @@ bool Sphere::checkIntersection(const Ray& r, double tMin, double tMax, hit_recor
 		if (temp < tMax && temp > tMin) {
 			rec.t = temp;
 			rec.pos = r.pointAtParam(rec.t);
-			rec.normal = (rec.pos - center(r.time())) / _radius;
+			rec.normal = (rec.pos - ctr) / _radius;
 			rec.hitMat = _mat;
+			getSphereUVs((rec.pos - ctr)/_radius, rec.u, rec.v);
+
 			return true;
 		}
 	}
@@ -69,5 +81,4 @@ bool Sphere::boundingBox(double t0, double t1, AABB& box) const {
 	box = surroundingBox(b0, b1);
 	return true;
 }
-
 #endif

@@ -9,7 +9,7 @@ class MetalMaterial : public Material {
 		virtual bool scatter(const Ray& rIn, const hit_record& rec, Vec3& attenuation, Ray& scattered) const {
 			Vec3 ref = reflect(normalize(rIn.direction()), rec.normal);
 			scattered = Ray(rec.pos, ref + _fuzz*randomInUnitSphere(), rIn.time());
-			attenuation = _albedo->value(0.0, 0.0, rec.pos);
+			attenuation = _albedo->value(rec.u, rec.v, rec.pos);
 			return dot(scattered.direction(), rec.normal) > 0.0;
 		}
 

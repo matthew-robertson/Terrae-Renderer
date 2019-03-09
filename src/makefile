@@ -1,7 +1,7 @@
 OUT=../build
 
 Terrae: Renderer.o lodepng.o
-	g++ -o $(OUT)/Terrae2 $(OUT)/Renderer.o $(OUT)/lodepng.o -lm
+	g++ -o $(OUT)/Terrae $(OUT)/Renderer.o $(OUT)/lodepng.o -lm
 
 lodepng.o: lodepng.h lodepng.cpp
 	g++ -c -o $(OUT)/lodepng.o lodepng.cpp

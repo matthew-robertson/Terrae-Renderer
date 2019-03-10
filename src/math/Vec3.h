@@ -169,7 +169,7 @@ Vec3 randomInUnitSphere() {
 
 	do {
 		p = 2.0*Vec3(randDouble(), randDouble(), randDouble()) - Vec3(1.0);
-	} while (p.squaredLength() >= 1.0);
+	} while (p.squaredLength() >= 1.0 || p.squaredLength() <= 0.0);
 	return p;
 }
 
@@ -177,8 +177,8 @@ Vec3 randomInUnitDisc() {
 	Vec3 p;
 
 	do {
-		p = 2.0* Vec3(randDouble(), randDouble(), 0.0) - Vec3(1.0,1.0, 0.0);
-	} while (dot(p,p) >= 1.0);
+		p = 2.0* Vec3(randDouble(), randDouble(), 0.0) - Vec3(1.0,1.0,0.0);
+	} while (dot(p,p) >= 1.0 || p.squaredLength() <= 0.0);
 	return p;
 }
 

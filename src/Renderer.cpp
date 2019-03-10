@@ -31,9 +31,9 @@ Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	if (world->checkIntersection(r, 0.001, DBL_MAX, rec)){
 		Ray scattered;
 		Vec3 attenuation;
-		Vec3 emitted = rec.hitMat->emitted(0, 0, rec.pos);
+		Vec3 emitted = rec.hitMat->emitted(rec.u, rec.v, rec.pos);
 		if (depth < 50 && rec.hitMat->scatter(r, rec, attenuation, scattered)) {
-			return emitted + attenuation * getColour(scattered, world, depth+1);
+			return emitted + attenuation*getColour(scattered, world, depth+1);
 		} else {
 			return emitted;
 		}
@@ -181,6 +181,10 @@ void main(int argc, char *argv[])
 				col += getColour(r, world, 0);
 			}
 			col/= nAAR;
+			if (col[0] > 1.) col[0] = 1.0;
+			if (col[1] > 1.) col[1] = 1.0;
+			if (col[2] > 1.) col[2] = 1.0;
+
 			col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
 			image.push_back(255 * col[0]);

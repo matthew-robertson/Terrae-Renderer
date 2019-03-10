@@ -1,14 +1,14 @@
-#ifndef LAMBERTH
-#define LAMBERTH
+#ifndef ISOTROPICH
+#define ISOTROPICH
 
 #include "../Textures/Texture.h"
+#include "Material.h"
 
-class LambertMaterial : public Material {
+class IsotropicMaterial : public Material {
 	public:
-		LambertMaterial(Texture * t): albedo(t) {}
+		IsotropicMaterial(Texture * t): albedo(t) {}
 		virtual bool scatter(const Ray& rIn, const hit_record& rec, Vec3& attenuation, Ray& scattered) const {
-			Vec3 targetPoint = rec.pos + rec.normal + randomInUnitSphere();
-			scattered = Ray(rec.pos, targetPoint - rec.pos, rIn.time());
+			scattered = Ray(rec.pos, randomInUnitSphere());
 			attenuation = albedo->value(rec.u, rec.v, rec.pos);
 			return true;
 		}

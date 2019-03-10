@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Geometry/Box.h"
 #include "Geometry/BVHNode.h"
+#include "Geometry/ConstantMedium.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/HitableCollection.h"
 #include "Geometry/Rect.h"
@@ -48,23 +49,26 @@ Hitable *cornellBox() {
 	Material *white = new LambertMaterial(new ConstantTexture(Vec3(0.73)));
 	Material *red = new LambertMaterial(new ConstantTexture(Vec3(0.65, 0.05, 0.05)));
 	Material *green = new LambertMaterial(new ConstantTexture(Vec3(0.12, 0.43, 0.15)));
-	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(15)));
+	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(7)));
 	
 	list[i++] = new FlipNormals(new YZRect(Vec3(555,277,277), Vec3(0,278,278), green));
 	list[i++] = new YZRect(Vec3(0,277,277), Vec3(0,278,278), red);
-	list[i++] = new XZRect(Vec3(278,554,280), Vec3(65,0,53), light);
+	list[i++] = new XZRect(Vec3(278,554,280), Vec3(165,0,153), light);
 	list[i++] = new FlipNormals(new XZRect(Vec3(277,555,277), Vec3(278,0,278), white));
 	list[i++] = new XZRect(Vec3(277,0,277), Vec3(278,0,278), white);
 	list[i++] = new FlipNormals(new XYRect(Vec3(277,277,555), Vec3(278,278,0), white));
 
-	list[i++] = new Translate(new RotateY(
+	Hitable *b1 = new Translate(new RotateY(
 					new Box(Vec3(0), Vec3(165,165,165), white),
 					-18),
 					Vec3(130,0,65));
-	list[i++] = new Translate(new RotateY(
+	Hitable *b2 = new Translate(new RotateY(
 					new Box(Vec3(0), Vec3(165,330,165), white),
 					15),
 					Vec3(265,0,295));
+
+	list[i++] = new ConstantMedium(b1, 0.01, new ConstantTexture(Vec3(1.0)));
+	list[i++] = new ConstantMedium(b2, 0.01, new ConstantTexture(Vec3(0.0)));
 
 	return new HitableCollection(list, i);
 }

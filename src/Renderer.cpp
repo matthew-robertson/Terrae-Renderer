@@ -25,6 +25,7 @@
 #include "Textures/Texture.h"
 #include "Textures/CheckerTexture.h"
 #include "Textures/ImageTexture.h"
+#include "Textures/NoiseTexture.h"
 
 Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
@@ -44,16 +45,16 @@ Vec3 getColour(const Ray& r, Hitable *world, int depth) {
 }
 
 Hitable *cornellBox() {
-	Hitable **list = new Hitable*[8];
+	Hitable **list = new Hitable*[9];
 	int i = 0;
 	Material *white = new LambertMaterial(new ConstantTexture(Vec3(0.73)));
 	Material *red = new LambertMaterial(new ConstantTexture(Vec3(0.65, 0.05, 0.05)));
 	Material *green = new LambertMaterial(new ConstantTexture(Vec3(0.12, 0.43, 0.15)));
-	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(7)));
+	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(14)));
 	
 	list[i++] = new FlipNormals(new YZRect(Vec3(555,277,277), Vec3(0,278,278), green));
 	list[i++] = new YZRect(Vec3(0,277,277), Vec3(0,278,278), red);
-	list[i++] = new XZRect(Vec3(278,554,280), Vec3(165,0,153), light);
+	list[i++] = new XZRect(Vec3(278,554,280), Vec3(65,0,53), light);
 	list[i++] = new FlipNormals(new XZRect(Vec3(277,555,277), Vec3(278,0,278), white));
 	list[i++] = new XZRect(Vec3(277,0,277), Vec3(278,0,278), white);
 	list[i++] = new FlipNormals(new XYRect(Vec3(277,277,555), Vec3(278,278,0), white));
@@ -67,8 +68,12 @@ Hitable *cornellBox() {
 					15),
 					Vec3(265,0,295));
 
-	list[i++] = new ConstantMedium(b1, 0.01, new ConstantTexture(Vec3(1.0)));
-	list[i++] = new ConstantMedium(b2, 0.01, new ConstantTexture(Vec3(0.0)));
+	list[i++] = new ConstantMedium(b1, 0.01, new ConstantTexture(Vec3(0.12, 0.12,.73)));
+	list[i++] = b2;
+	list[i++] = new Sphere(Vec3(400, 100, 100), Vec3(400, 100, 100), 
+						100, 
+						0.0, 1.0,
+						new DielectricMaterial(1.5));
 
 	return new HitableCollection(list, i);
 }
@@ -80,17 +85,20 @@ Hitable *simpleLight() {
 	Texture *white = new ConstantTexture(Vec3(0.9, 0.9, 0.9));
 	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(4.0)));
 
-	list[0] = new Sphere(Vec3(0, -1000, 0), Vec3(0, -1000, 0), 
-						1000, 
-						0.0, 1.0,
-						new LambertMaterial(new CheckerTexture(green, white)));
 	int nx, ny, nn;
 	unsigned char *tex_data = stbi_load("../testScenes/earthmap.jpg", &nx, &ny, &nn, 0);
 	Material *earth = new LambertMaterial(new ImageTexture(tex_data, nx, ny));
+	Material *noisy = new LambertMaterial(new NoiseTexture(4.));
+
+	list[0] = new Sphere(Vec3(0, -1000, 0), Vec3(0, -1000, 0), 
+						1000, 
+						0.0, 1.0,
+						noisy);
+						//new LambertMaterial(new CheckerTexture(green, white)));
 	list[1] = new Sphere(Vec3(0, 2, 0), Vec3(0, 2, 0), 
 						2, 
 						0.0, 1.0,
-						earth
+						noisy
 						/*new DielectricMaterial(1.5)*/);
 	list[2] = new Sphere(Vec3(3, 7, 4), Vec3(3, 7, 4), 
 						2, 
@@ -142,7 +150,6 @@ Hitable *randomScene() {
 	return new BVHNode(list, i, 0, 1);
 }
 
-
 void main(int argc, char *argv[])  
 {  
 	if (argc  != 6 ){
@@ -160,13 +167,15 @@ void main(int argc, char *argv[])
 	//Camera setup
 	Vec3 lookFrom = Vec3(278,278,-800);
 	Vec3 lookAt = Vec3(278, 278, 0);
+	//Vec3 lookFrom = Vec3(13, 2,3);
+	//Vec3 lookAt = Vec3(0.);
 	double dist = 10.0;
 	double ap = 0.00;
 	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 40, double(width)/double(height), ap, dist, 0.0, 1.0);
 
 	// TODO: Parse the scene file
 	//Hitable *world = randomScene();
-	Hitable *world = simpleLight();
+	Hitable *world = cornellBox();
 	std::cout << "Starting!" << std::endl;
 	// TODO: Path trace some shit
 	std::vector<unsigned char> image;

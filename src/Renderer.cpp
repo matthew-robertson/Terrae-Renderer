@@ -166,7 +166,7 @@ void main(int argc, char *argv[])
 
 	// TODO: Parse the scene file
 	//Hitable *world = randomScene();
-	Hitable *world = cornellBox();
+	Hitable *world = simpleLight();
 	std::cout << "Starting!" << std::endl;
 	// TODO: Path trace some shit
 	std::vector<unsigned char> image;

@@ -30,7 +30,6 @@ bool ConstantMedium::checkIntersection(const Ray& r, double tMin, double tMax, h
 
 	if(_boundary->checkIntersection(r,-DBL_MAX,DBL_MAX, rec1)) {
 		if(_boundary->checkIntersection(r, rec1.t+0.0001, DBL_MAX, rec2)) {
-			if (db) std::cerr << "\nt0 t1 " << rec1.t << " " << rec2.t << "\n";
 			if (rec1.t < tMin) rec1.t = tMin;
 			if (rec2.t > tMax) rec2.t = tMax;
 			if (rec1.t < 0.) rec1.t = 0;

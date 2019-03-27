@@ -14,6 +14,7 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/HitableCollection.h"
 #include "Geometry/Rect.h"
+#include "Geometry/Triangle.h"
 #include "Geometry/Transforms.h"
 #include "Mats/LambertMaterial.h"
 #include "Mats/MetalMaterial.h"
@@ -50,11 +51,11 @@ Hitable *cornellBox() {
 	Material *white = new LambertMaterial(new ConstantTexture(Vec3(0.73)));
 	Material *red = new LambertMaterial(new ConstantTexture(Vec3(0.65, 0.05, 0.05)));
 	Material *green = new LambertMaterial(new ConstantTexture(Vec3(0.12, 0.43, 0.15)));
-	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(14)));
+	Material *light = new DiffuseLightMaterial(new ConstantTexture(Vec3(7)));
 	
 	list[i++] = new FlipNormals(new YZRect(Vec3(555,277,277), Vec3(0,278,278), green));
 	list[i++] = new YZRect(Vec3(0,277,277), Vec3(0,278,278), red);
-	list[i++] = new XZRect(Vec3(278,554,280), Vec3(65,0,53), light);
+	list[i++] = new XZRect(Vec3(278,554,280), Vec3(130,0,106), light);
 	list[i++] = new FlipNormals(new XZRect(Vec3(277,555,277), Vec3(278,0,278), white));
 	list[i++] = new XZRect(Vec3(277,0,277), Vec3(278,0,278), white);
 	list[i++] = new FlipNormals(new XYRect(Vec3(277,277,555), Vec3(278,278,0), white));
@@ -70,10 +71,8 @@ Hitable *cornellBox() {
 
 	list[i++] = new ConstantMedium(b1, 0.01, new ConstantTexture(Vec3(0.12, 0.12,.73)));
 	list[i++] = b2;
-	list[i++] = new Sphere(Vec3(400, 100, 100), Vec3(400, 100, 100), 
-						100, 
-						0.0, 1.0,
-						new DielectricMaterial(1.5));
+	list[i++] = new Triangle(Vec3(400, 0, 150), Vec3(500, 0, 50), Vec3(300,0,50),
+						red);
 
 	return new HitableCollection(list, i);
 }
